@@ -40,14 +40,21 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // JPQL : 테이블이 아닌 객체를 대상으로 검색하는 객체 지향 쿼리
-            List<Member> resultList = em.createQuery("select m from Member as m", Member.class)
-                    .getResultList();
-            for (Member member : resultList) {
-                System.out.println("member.getName() = " + member.getName());
-            }
+            // 비영속 상태
+            Member member = new Member();
+            member.setId(101L);
+            member.setName("HelloJPA");
 
-            tx.commit();
+            // 영속 상태 ! entityManager를 통해 영속성컨텍스트에 접근
+            System.out.println("=== BEFORE ===");
+            em.persist(member); //이때 쿼리가 나가지 않고, 1차 캐시에 저장.
+            System.out.println("=== AFTER ===");
+
+            Member findMember = em.find(Member.class, 101L);
+            System.out.println("findMember.id = " + findMember.getId());//이때 조회를 했지만, select쿼리가 안나간다.
+            System.out.println("findMember.name = " + findMember.getName());//why? 1차캐시에서 조회했기 때문에
+
+            tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
             tx.rollback();
         } finally {
