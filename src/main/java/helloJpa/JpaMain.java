@@ -1,9 +1,6 @@
 package helloJpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -40,20 +37,25 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 비영속 상태
-            Member member = new Member();
-            member.setId(101L);
-            member.setName("HelloJPA");
 
-            // 영속 상태 ! entityManager를 통해 영속성컨텍스트에 접근
-            System.out.println("=== BEFORE ===");
-            em.persist(member); //이때 쿼리가 나가지 않고, 1차 캐시에 저장.
-            System.out.println("=== AFTER ===");
+            // 영속
+            Member member1 = new Member();
+            member1.setId(5L);
+            member1.setName("member52");
+            Member member2 = new Member();
+            member2.setId(6L);
+            member2.setName("member53");
+            Member member3 = new Member();
+            member3.setId(7L);
+            member3.setName("member54");
 
-            Member findMember = em.find(Member.class, 101L);
-            System.out.println("findMember.id = " + findMember.getId());//이때 조회를 했지만, select쿼리가 안나간다.
-            System.out.println("findMember.name = " + findMember.getName());//why? 1차캐시에서 조회했기 때문에
+            em.persist(member1);
+            em.persist(member2);
+            em.persist(member3);
 
+            em.flush();
+
+            System.out.println("===========================");
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
             tx.rollback();

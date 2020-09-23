@@ -9,6 +9,7 @@ public class Member {
     @Id
     private Long id;
     // @Column(name = "username") -> 만약 컬럼 명이 username 일 경우
+    // @Column(unique = true, length = 10) -> 제약조건 : unique, 길이 10 제한.
     private String name;
 
     public Long getId() {
