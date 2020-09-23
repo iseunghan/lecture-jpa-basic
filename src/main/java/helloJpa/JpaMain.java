@@ -37,25 +37,13 @@ public class JpaMain {
         tx.begin();
 
         try {
+            Member member = new Member();
+            member.setId(1);
+            member.setUsername("AB");
+            member.setRoleType(RoleType.USER);
 
-            // 영속
-            Member member1 = new Member();
-            member1.setId(5L);
-            member1.setName("member52");
-            Member member2 = new Member();
-            member2.setId(6L);
-            member2.setName("member53");
-            Member member3 = new Member();
-            member3.setId(7L);
-            member3.setName("member54");
+            em.persist(member);
 
-            em.persist(member1);
-            em.persist(member2);
-            em.persist(member3);
-
-            em.flush();
-
-            System.out.println("===========================");
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
             tx.rollback();

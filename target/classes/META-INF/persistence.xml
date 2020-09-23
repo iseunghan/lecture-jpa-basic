@@ -15,7 +15,16 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
-            <!--<property name="hibernate.hbm2ddl.auto" value="create" />-->
+<!--  create : 처음 실행시 자동으로 테이블을 drop 하고 create를 해준다.           -->
+<!--  create-drop : create와 동일하나, drop을 마지막에 실행한다.            -->
+<!--  update : 변경정보를 alter 해준다.            -->
+<!--  validate : 테이블 매핑이 잘되어있는지 확인            -->
+<!--  none :  사용하지 않음             -->
+            <property name="hibernate.hbm2ddl.auto" value="create" />
+<!--            <property name="hibernate.hbm2ddl.auto" value="create-drop" />-->
+<!--            <property name="hibernate.hbm2ddl.auto" value="update" />-->
+<!--            <property name="hibernate.hbm2ddl.auto" value="validate" />-->
+<!--            <property name="hibernate.hbm2ddl.auto" value="none" />-->
         </properties>
     </persistence-unit>
 </persistence>
