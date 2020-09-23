@@ -38,11 +38,23 @@ public class JpaMain {
 
         try {
             Member member = new Member();
-            member.setId(1);
-            member.setUsername("AB");
-            member.setRoleType(RoleType.USER);
+            member.setUsername("A");
+            Member member1 = new Member();
+            member1.setUsername("B");
+            Member member2 = new Member();
+            member2.setUsername("C");
 
-            em.persist(member);
+            System.out.println("==============");
+            //call next value for member_seq 가 두번 실행된다.
+            // 성능 최적화를 위해 50개를 미리 next value를 땡기는 것이다.
+            em.persist(member); // 총 두번 실행 / (1) value:1, (2) 51 까지 만들어놓는다
+            em.persist(member1); //Memory에서 2 가져옴.
+            em.persist(member2); //동일하게 3 가져옴.
+
+            System.out.println(member.getId());
+            System.out.println(member1.getId());
+            System.out.println(member2.getId());
+            System.out.println("==============");
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
