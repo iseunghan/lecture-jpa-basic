@@ -3,8 +3,6 @@ package helloJpa;
 import javax.persistence.*;
 
 @Entity
-@SequenceGenerator(name = "member_sequence", sequenceName = "member_seq"
-, initialValue = 1, allocationSize = 50) // 무조건 많다고 좋은게 아니고 50,100이 적당하다.
 public class Member {
     /**
      * 기본 키 매핑 방법
@@ -19,15 +17,18 @@ public class Member {
      *                      호출 될때마다 call을 하지 않고, 메모리에서 땡겨서 사용하는 방식이다.
      *                      그리고 다음 또 insert를 날릴때는 다시 51번부터 100번대 까지 사용 하는 방식이다.
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_sequence")
+    @Id @GeneratedValue
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "USERNAME")
     private String username;
 
-    public Member() {
-    }
+    /*@Column(name = "TEAM_ID")
+    private Long teamId;*/
+
+    @ManyToOne // 1 :Team <-> n: Member 이것을 Member입장에서 매핑!
+    @JoinColumn(name = "TEAM_ID") // 조인하는 컬럼을 적어준다!
+    private Team team; // error가 나는 이유는 몇대몇인지 관계를 매핑해줘야한다.
 
     public Long getId() {
         return id;
@@ -43,5 +44,13 @@ public class Member {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 }

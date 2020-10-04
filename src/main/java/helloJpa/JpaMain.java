@@ -37,24 +37,25 @@ public class JpaMain {
         tx.begin();
 
         try {
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
+
             Member member = new Member();
-            member.setUsername("A");
-            Member member1 = new Member();
-            member1.setUsername("B");
-            Member member2 = new Member();
-            member2.setUsername("C");
+            member.setUsername("MemberA");
+            //member.setTeamId(team.getId()); // issue!
+            member.setTeam(team);
+            em.persist(member);
 
-            System.out.println("==============");
-            //call next value for member_seq 가 두번 실행된다.
-            // 성능 최적화를 위해 50개를 미리 next value를 땡기는 것이다.
-            em.persist(member); // 총 두번 실행 / (1) value:1, (2) 51 까지 만들어놓는다
-            em.persist(member1); //Memory에서 2 가져옴.
-            em.persist(member2); //동일하게 3 가져옴.
+            //만약 select 쿼리가 나가는걸 보고 싶을떈 아래 코드를 추가하면 된다.
+            em.flush();
+            em.clear();
 
-            System.out.println(member.getId());
-            System.out.println(member1.getId());
-            System.out.println(member2.getId());
-            System.out.println("==============");
+            Member findMember = em.find(Member.class, member.getId());//여기서는 select 쿼리가 안나간다. 왜? 영속성컨텍스트의 1차캐시에서 가져오기 떄문에!
+            /*Long teamId = findMember.getTeamId();
+            Team findTeam = em.find(Team.class, teamId);*/
+            Team findTeam = findMember.getTeam();
+            System.out.println("findTeam = "+findTeam.getName());
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
