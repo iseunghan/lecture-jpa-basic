@@ -26,9 +26,14 @@ public class Member {
     /*@Column(name = "TEAM_ID")
     private Long teamId;*/
 
+    // 의존관계의 주인(Owner)이다. (거의 Many쪽이 주인이 된다)
     @ManyToOne // 1 :Team <-> n: Member 이것을 Member입장에서 매핑!
     @JoinColumn(name = "TEAM_ID") // 조인하는 컬럼을 적어준다!
     private Team team; // error가 나는 이유는 몇대몇인지 관계를 매핑해줘야한다.
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 
     public Long getId() {
         return id;
@@ -49,8 +54,10 @@ public class Member {
     public Team getTeam() {
         return team;
     }
+    // 연관관계 편의 메소드는 어느쪽에 넣어도 상관없지만, 무조건 한쪽에만 넣어야한다. 안그러면 무한루프에 빠짐.
 
-    public void setTeam(Team team) {
+    public void changeTeam(Team team) { // 메소드 명을 setTeam 보다는 changeTeam으로 바꿔주면, 뭔가 더 중요한 일을 하는구나! 라고 명시해 줄수 있기 때문에 더 좋다
         this.team = team;
+        team.getMembers().add(this); // 이렇게하면, setTeam을 설정하는 시점에 양쪽에 데이터가 세팅이 되버리는 이점이 있다.
     }
 }
