@@ -1,23 +1,37 @@
 package jpabook.jpashop.domain;
 
 
+import org.hibernate.annotations.ManyToAny;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 public class OrderItem {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "ORDER_ITEM_ID")
     private Long id;
 
-    @Column(name = "ORDER_ID")
-    private  Long orderId;
+//    @Column(name = "ORDER_ID")
+//    private  Long orderId;
 
-    @Column(name = "MEMBER_ID")
-    private Long memberId;
+//    @Column(name = "ITEM_ID")
+//    private Long itemId;
+    /**
+     * 여기서도 Id 대신에 객체를 직접 매핑 시켜준다.
+     * 어떻게? -> @ManyToOne + @JoinColumn(name = 객체의 기본키 컬럼명")
+     */
+    @ManyToOne
+    @JoinColumn(name = "ORDER_ID")
+    private Order order;
 
-//    @Column(name = "ORDER_DATE_TIME") // 컬럼명은 이런식으로 매핑시키는 것이 더 좋다
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
+    private Member member;
+
+    //    @Column(name = "ORDER_DATE_TIME") // 컬럼명은 이런식으로 매핑시키는 것이 더 좋다
     private LocalDateTime orderDateTime;
 
     @Enumerated(EnumType.STRING)
@@ -31,20 +45,20 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Long getOrderId() {
-        return orderId;
+    public Order getOrder() {
+        return order;
     }
 
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public LocalDateTime getOrderDateTime() {

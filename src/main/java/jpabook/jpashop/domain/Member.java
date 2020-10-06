@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -8,6 +10,10 @@ public class Member {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "MEMBER_ID") // 애매한 컬럼만 이름 매핑해준다. java에서는 memberId / DB에서는 member_id or MEMBER_ID 이런식으로 "_"를 선호하는 편이다.
     private Long id;
+
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = new ArrayList<>();
+
     private String name;
     private String city;
     private String street;

@@ -2,6 +2,8 @@ package jpabook.jpashop.domain;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")
@@ -19,14 +21,34 @@ public class Order {
     // - 테이블의 외래키를 객체에 그대로 가져옴
     // - 객체 그래프 탐색이 불가능
     // - 참조가 없으므로 UML도 잘못됨 ( n:m 관계 설정이 다 끊긴다.)
-   @Column(name = "MEMBER_ID")
-    private Long memberId;
 
-//    @Column(name = "ORDER_DATE") 이런식으로 name을 매핑시켜주는것이 더 좋다!
+//    @Column(name = "MEMBER_ID")
+//    private Long memberId;
+    /**
+     * 이제는 객체 지향적으로 매핑을 하기 위해서, Long id 대신에 Member 객체를 저장한다.
+     * @ManyToOne : Order입장에서는 하나의 회원이 여러개의 주문을 할수 있으니 Many에 해당한다.
+     * @JoinColumn : MEMBER_ID와 조인 시킨다.
+     */
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
+    private Member member;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    //    @Column(name = "ORDER_DATE") 이런식으로 name을 매핑시켜주는것이 더 좋다!
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING) //ORDINAL 사용 금지 !
     private OrderStatus status;
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
 
     public Long getId() {
         return id;
@@ -34,14 +56,6 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
     }
 
     public LocalDateTime getOrderDate() {
