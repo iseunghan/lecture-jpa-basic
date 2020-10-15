@@ -6,6 +6,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>helloJpa.Member</class>
         <class>helloJpa.Team</class>
+        <class>helloJpa.Locker</class>
         <!--<class>jpabook.jpashop.domain.Member</class>
         <class>jpabook.jpashop.domain.Order</class>
         <class>jpabook.jpashop.domain.Item</class>

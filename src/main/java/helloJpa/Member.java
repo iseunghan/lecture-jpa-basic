@@ -23,13 +23,22 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
+
     /*@Column(name = "TEAM_ID")
     private Long teamId;*/
+
 
     // 의존관계의 주인(Owner)이다. (거의 Many쪽이 주인이 된다)
     @ManyToOne // 1 :Team <-> n: Member 이것을 Member입장에서 매핑!
     @JoinColumn(name = "TEAM_ID") // 조인하는 컬럼을 적어준다!
     private Team team; // error가 나는 이유는 몇대몇인지 관계를 매핑해줘야한다.
+
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
 
     public void setTeam(Team team) {
         this.team = team;
