@@ -31,6 +31,10 @@ public class OrderItem {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "ITEM_ID")
+    private Item item;
+
     //    @Column(name = "ORDER_DATE_TIME") // 컬럼명은 이런식으로 매핑시키는 것이 더 좋다
     private LocalDateTime orderDateTime;
 

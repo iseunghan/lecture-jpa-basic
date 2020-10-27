@@ -36,6 +36,10 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "DELIVERY_ID")
+    private Delivery delivery;
+
     //    @Column(name = "ORDER_DATE") 이런식으로 name을 매핑시켜주는것이 더 좋다!
     private LocalDateTime orderDate;
 
