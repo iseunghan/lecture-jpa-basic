@@ -1,6 +1,8 @@
 package helloJpa;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -23,10 +25,6 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
-    @ManyToOne
-    @JoinColumn(name = "TEAM_ID")
-    private Team team;
-
     /*@Column(name = "TEAM_ID")
     private Long teamId;*/
 
@@ -39,6 +37,24 @@ public class Member {
     @OneToOne
     @JoinColumn(name = "LOCKER_ID")
     private Locker locker;
+
+    /**
+     * 다대다 매핑은 왠만하면 안쓰는게 최선이다.
+     *
+     * 첫번째 방법. @ManyToMany 사용
+     */
+    /*@ManyToMany
+    @JoinTable(name = "MEMBER_PRODUCT") // 이렇게 하면 MEMBER_PRODUCT라는 테이블이 생성이 된다. (중간 테이블)
+    private List<Product> products = new ArrayList<>();*/
+
+    /**
+     * 다대다 매핑 두번째 방법.
+     * 연결 테이블용 엔티티 추가(연결 테이블을 엔티티로 승격)
+     *
+     * @ManyToMany 를 -> @OneToMany 두개로 풀어서 관계 매핑
+     */
+    @OneToMany(mappedBy = "member")
+    private List<Member_Product> products = new ArrayList<>();
 
     public void setTeam(Team team) {
         this.team = team;

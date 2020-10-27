@@ -7,6 +7,8 @@
         <class>helloJpa.Member</class>
         <class>helloJpa.Team</class>
         <class>helloJpa.Locker</class>
+        <class>helloJpa.Product</class>
+        <class>helloJpa.Member_Product</class>
         <!--<class>jpabook.jpashop.domain.Member</class>
         <class>jpabook.jpashop.domain.Order</class>
         <class>jpabook.jpashop.domain.Item</class>
