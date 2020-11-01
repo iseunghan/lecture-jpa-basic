@@ -42,7 +42,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) // 조인 전략이기 때문에 joined로 설정해주어야한다.
 @DiscriminatorColumn // SINGLE_TABLE 전략을 사용하면 기본적으로 DTYPE이 생성되기 때문에 해당 애노테이션은 삭제해도 된다.
-public abstract class Item {
+public abstract class Item extends BaseEntity{
     @Id @GeneratedValue
     private Long id;
 

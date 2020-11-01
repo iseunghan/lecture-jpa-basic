@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDateTime;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -20,18 +21,21 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Movie movie = new Movie();
-            movie.setDirector("aaaa");
-            movie.setActor("bbbb");
-            movie.setName("바람과함께사라지다");
-            movie.setPrice(1000);
-            em.persist(movie);
+            Book book = new Book();
+            book.setName("book1");
+            book.setCreatedBy("set1");
+            book.setCreatedByDate(LocalDateTime.now());
+
+            em.persist(book);
 
             em.flush();
-            em.clear(); // db 영속성 컨텍스트를 날려주고, 1차 캐시를 비워준다. (쿼리를 보기 위함)
+            em.clear();
 
-            Movie findMovie = em.find(Movie.class, movie.getId()); // jpa가 알아서 join을 해서 값을 가져온다.
-            System.out.println("findMovie = " + findMovie);
+            Book findBook = em.find(Book.class, book.getId());
+            String createdBy = findBook.getCreatedBy();
+            LocalDateTime createdByDate = findBook.getCreatedByDate();
+            System.out.println(createdBy + ", " + createdByDate);
+
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {

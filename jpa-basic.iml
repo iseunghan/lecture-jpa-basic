@@ -5,6 +5,7 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <datasource-mapping>
+          <factory-entry name="chapter7" />
           <factory-entry name="hello" />
           <factory-entry name="helloshop" />
         </datasource-mapping>
