@@ -1,6 +1,8 @@
 package jpabook.jpashop;
 
 
+import jpabook.jpashop.domain.Book;
+import jpabook.jpashop.domain.Item;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
 
@@ -21,6 +23,13 @@ public class JpaShopMain {
         tx.begin();
 
         try {
+            Book book = new Book();
+            book.setName("jpa");
+            book.setAuthor("0han");
+            book.setPrice(5000);
+
+            em.persist(book);
+
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
             tx.rollback();

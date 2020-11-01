@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Member {
+public class Member extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "MEMBER_ID") // 애매한 컬럼만 이름 매핑해준다. java에서는 memberId / DB에서는 member_id or MEMBER_ID 이런식으로 "_"를 선호하는 편이다.
