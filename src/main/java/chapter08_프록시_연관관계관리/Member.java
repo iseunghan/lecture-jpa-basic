@@ -25,8 +25,12 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
-    // 의존관계의 주인(Owner)이다. (거의 Many쪽이 주인이 된다)
-    @ManyToOne // 1 :Team <-> n: Member 이것을 Member입장에서 매핑!
+    /**
+     * fetch = FetchType.EAGER(즉시 로딩) or LAZY(지연 로딩)
+     *      - LAZY 로딩을 하면, team은 프록시 가짜 객체가 담기게 되고, team을 실제로 사용하는 시점에 쿼리가 나가게 된다. ex) team.getName() 이 시점.
+     *      - EAGER 로딩을 하게 되면, team은 진짜 객체를 넣어준다. 쿼리를 한방에 조인하여 땡겨오게 된다.
+     */
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY로 설정하면, team에 프록시 객체를 넣어준다.
     @JoinColumn(name = "TEAM_ID") // 조인하는 컬럼을 적어준다!
     private Team team; // error가 나는 이유는 몇대몇인지 관계를 매핑해줘야한다.
 

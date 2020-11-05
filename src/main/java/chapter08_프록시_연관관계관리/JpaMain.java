@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 /**
  * 프록시
@@ -22,85 +23,43 @@ public class JpaMain {
         tx.begin();
 
         try {
+            /**
+             * (가급적 지연 로딩만 사용! (특히 실무에서) )
+             * 지연 로딩 LAZY 를 사용하면 프록시 객체를 가져옴
+             * 즉시 로딩 EAGER를 사용하게 되면 실제 객체를 가져오게 된다.
+             *
+             * - 즉시 로딩을 사용 하면 안되는 이유
+             *      - 즉시 로딩을 적용하면 예상하지 못한 SQL이 발생한다.
+             *      - 즉시 로딩은 JPQL에서 N+1 문제를 일으킨다.
+             *      - @ManyToOne, @OneToOne은 기본이 즉시 로딩 -> LAZY로 설정
+             *      - @OneToMany, @ManyToMany는 기본이 지연 로딩
+            */
             Member member1 = new Member();
             member1.setUsername("hello");
-
             em.persist(member1);
 
-            Member member2 = new Member();
-            member2.setUsername("hello2");
-
-            em.persist(member2);
-
-            em.flush();
-            em.clear();
-
-            /*Member findMember = em.find(Member.class, member1.getId());
-            System.out.println("findMember = " + findMember.getId());
-            System.out.println("findMember = " + findMember.getUsername());*/
-            /**
-             * Proxy 객체의 초기화 과정!
-             * 1) Member.getName()을 호출하면, Member target에는 처음에 값이 null이기 때문에
-             * 2) 영속성컨텍스트에 실제 값을 달라고 요청을 한다.
-             * 3) 그러면 db를 조회해서 진짜 객체를 가져와 엔티티를 생성하게 되고, target은 그 실제 엔티티를 가리키게 된다.
-             * 4) 이제 getName()은 target.getName()(..실제론, member1.getName()..)이 호출되어서 우리한테 값이 전달되는 것이다
-             */
-            Member findMember = em.getReference(Member.class, member1.getId()); // 이 시점에는 select쿼리가 안나간다! 가짜 객체이기 때문에!
-            System.out.println("findMember = " + findMember.getClass()); // "class chapter08_프록시_연관관계관리.Member$HibernateProxy$waCRsb9J" HibernateProxy.. 라고 찍히게 된다. (프록시가 만든 가짜 클래스라는 말이다!)
-            System.out.println("findMember = " + findMember.getId());
-            System.out.println("findMember = " + findMember.getUsername()); // 실제로 findMember를 사용하는 시점에!! 가짜 객체 이기 때문에, select쿼리가 날라가게 된다!
-            System.out.println("findMember = " + findMember.getUsername()); // 한번 초기화를 한 프록시는 이후에는 초기화 없이 쿼리 없이 사용 가능하다!
-
-            /**
-             * 프록시 객체와 타입 비교시 절대 == 비교 금지!!!! instance of 를 사용해라!
-             */
-            Member m1 = em.find(Member.class, member1.getId());
-            Member m2 = em.getReference(Member.class, member2.getId());
-            System.out.println("m1, m2 : " + (m1 instanceof Member));
-            System.out.println("m1, m2 : " + (m2 instanceof Member));
-
-            /**
-             * 영속성 컨텍스트에 엔티티가 이미 올라가있으면? em.getReference()를 호출해 proxy객체가 아닌 실제 객체가 반환됨!!!
-             *  왜 그럴까?? em.find를 했을때 이미 영속성 컨텍스트에는 Member엔티티가 올라가 있게 된다.
-             *  근데 거기서 굳이 있는데도 proxy객체로 가져오면 성능상 이점도 없는 이유 하나와..
-             *  jpa에서는 자바 컬렉션 비교 처럼 == 비교가 항상 true가 나오는것을 보장해야 하기 때문이다.
-             *  그리하여 proxy객체를 가져오지 않고, 실제 객체를 가져오게 되는것이다.
-             */
-            Member member = em.find(Member.class, member1.getId());
-            Member reference = em.getReference(Member.class, member1.getId());
-            System.out.println("a = a : " + (member == reference)); // true
-
-            /**
-             * em.getReference 후에 em.find를 하게 되면??
-             * 우리 생각으로는 em.getReference를 하면 proxy객체, em.find를 하면 Member객체가 나와야한다고 생각한다.
-             * 하지만, jpa는 ==비교를 참인 결과를 보장해줘야 하기 때문에, em.find를 해도 proxy객체를 반환시켜준다.
-             */
-            Member refMember = em.getReference(Member.class, member.getId());
-            Member findMember1 = em.find(Member.class, member.getId());
-            System.out.println("refMember = " + refMember.getClass()); // proxy객체
-            System.out.println("findMember1 = " + findMember1.getClass()); // proxy객체
-            System.out.println("refMember == findMember1 : " + (refMember == findMember1)); // true
+            Team team = new Team();
+            team.setName("team1");
+            member1.setTeam(team);
+            em.persist(team);
 
             em.flush();
             em.clear();
+
+            Member m = em.find(Member.class, member1.getId());
+            Team m_team = m.getTeam(); // 프록시 객체를 주기 때문에, 이때는 쿼리가 나가지 않는다.
+            System.out.println("m = " + m.getClass());
+            System.out.println("team = " + m_team.getClass());
+            System.out.println("===============");
+            m_team.getName();   // 이 시점에 쿼리가 나가게 된다! (DB조회)
+            System.out.println("===============");
+
             /**
-             * org.hibernate.LazyInitializationException
-             *      -> em.getReference 이후에 영속성 컨텍스트를 clear, close, detach 를 하고 난뒤에
-             *      reference를 사용하여 접근을 시도하면 Exception이 터지게 된다.
-             */
-            Member reference1 = em.getReference(Member.class, member1.getId());
-            System.out.println("reference1 : " + reference1.getClass());
-
-//            em.detach(reference1);
-//            em.clear();
-//            em.close();  하이버네이트가 업데이트가 되면서, 트랜잭션이 살아있으면 em.close()를 호출해도 완전히 닫히지 않은 읽기 가능 상태가 됩니다. 그리하여 조회가 가능하당
-
-            System.out.println("reference1.name = " + reference1.getUsername());
-
-
-
-
-
+             *  JPQL N+1 문제를 fetch join으로 부분적으로 해결시킬수 있다!
+             *  fetch join 을 사용하면 한방 쿼리를 날려서, 이후에 데이터를 조회해도 쿼리가 날라가지 않는다!
+            */
+            List<Member> list = em.createQuery("select m from Member m join fetch m.team", Member.class)
+                    .getResultList();
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
