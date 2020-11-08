@@ -23,43 +23,53 @@ public class JpaMain {
         tx.begin();
 
         try {
-            /**
-             * (가급적 지연 로딩만 사용! (특히 실무에서) )
-             * 지연 로딩 LAZY 를 사용하면 프록시 객체를 가져옴
-             * 즉시 로딩 EAGER를 사용하게 되면 실제 객체를 가져오게 된다.
-             *
-             * - 즉시 로딩을 사용 하면 안되는 이유
-             *      - 즉시 로딩을 적용하면 예상하지 못한 SQL이 발생한다.
-             *      - 즉시 로딩은 JPQL에서 N+1 문제를 일으킨다.
-             *      - @ManyToOne, @OneToOne은 기본이 즉시 로딩 -> LAZY로 설정
-             *      - @OneToMany, @ManyToMany는 기본이 지연 로딩
-            */
-            Member member1 = new Member();
-            member1.setUsername("hello");
-            em.persist(member1);
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            Team team = new Team();
-            team.setName("team1");
-            member1.setTeam(team);
-            em.persist(team);
+            Parent parent = new Parent();
+            parent.addChile(child1);
+            parent.addChile(child2);
+
+            /**
+             * CASCADE
+             * - ALL : 모두 적용 (lifecycle이 같을때)
+             * - PERSIST : 저장
+             *
+             * 코드 :
+             *      @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+             *      private Parent parent;
+             *      부모 엔티티를 저장할때, 자식 엔티티도 함께 저장이 된다!!
+             *      parent가 persist가 되면 연관관계가 설정된 child가 함께 persist가 된다.
+             */
+            em.persist(parent); // cascadeType.ALL 을 사용하면, 부모 엔티티만 persist해도 된다!
+//            em.persist(child1); 이렇게 매번 persist를 하기가 귀찮으니까 -> cascade옵션을 사용하면 된다.
+//            em.persist(child2);
 
             em.flush();
             em.clear();
 
-            Member m = em.find(Member.class, member1.getId());
-            Team m_team = m.getTeam(); // 프록시 객체를 주기 때문에, 이때는 쿼리가 나가지 않는다.
-            System.out.println("m = " + m.getClass());
-            System.out.println("team = " + m_team.getClass());
-            System.out.println("===============");
-            m_team.getName();   // 이 시점에 쿼리가 나가게 된다! (DB조회)
-            System.out.println("===============");
-
             /**
-             *  JPQL N+1 문제를 fetch join으로 부분적으로 해결시킬수 있다!
-             *  fetch join 을 사용하면 한방 쿼리를 날려서, 이후에 데이터를 조회해도 쿼리가 날라가지 않는다!
-            */
-            List<Member> list = em.createQuery("select m from Member m join fetch m.team", Member.class)
-                    .getResultList();
+             * 고아 객체 제거 : 부모 엔티티와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제
+             * (부모 엔티티에서 자식 엔티티 컬렉션에서 자식 엔티티를 삭제하면 해당 엔티티를 삭제를 시켜준다!
+             * -> 원래는 연관관계의 주인이 아닌 Parent가 orphanremoval로 인해 삭제가 가능해진 것이다.)
+             * cascadeType.REMOVE 와 유사하게 동작
+             * (주의!) 특정 엔티티가 개인 소유할 때 사용!
+             * - 방법 :
+             *      orphanRemoval = true 설정
+             * - 코드 :
+             *      Parent p1 = em.find(Parent.class, id);
+             *      p1.getChildList().remove(0);
+             *      이때! orphanRemoval에 의해 child 엔티티까지 삭제가 돼버린다.
+             */
+            Parent findParent = em.find(Parent.class, parent.getId());
+            findParent.getChildList().remove(0);
+//            em.remove(findParent); parent 자체를 삭제시켜도 orphanremoval가 작동된다.
+            /**
+             * CascadeType.ALL , orphanRemoval = true 를 둘다 사용하게 되면,,,, "부모 엔티티를 통해서 자식의 생명주기를 관리 할 수 있다."
+             * 원래 연관관계 주인인 Child에서의 parent객체가 수정 삭제를 할수 있는데...
+             * 저 두 옵션을 사용함으로써 어떻게 보면 부모 엔티티인 Parent가 Cascade로 영속화, orphanremoval로 삭제를
+             * 하고 있다.
+             */
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {

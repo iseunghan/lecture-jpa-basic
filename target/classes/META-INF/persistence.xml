@@ -29,6 +29,8 @@
         <class>chapter08_프록시_연관관계관리.Member_Product</class>
         <class>chapter08_프록시_연관관계관리.Product</class>
         <class>chapter08_프록시_연관관계관리.Team</class>
+        <class>chapter08_프록시_연관관계관리.Child</class>
+        <class>chapter08_프록시_연관관계관리.Parent</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
