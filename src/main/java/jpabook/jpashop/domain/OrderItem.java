@@ -1,45 +1,28 @@
 package jpabook.jpashop.domain;
 
 
-import org.hibernate.annotations.ManyToAny;
-
 import javax.persistence.*;
-import java.time.LocalDateTime;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
-public class OrderItem extends BaseEntity{
+public class OrderItem extends BaseEntity {
 
     @Id
     @GeneratedValue
     @Column(name = "ORDER_ITEM_ID")
     private Long id;
 
-//    @Column(name = "ORDER_ID")
-//    private  Long orderId;
-
-//    @Column(name = "ITEM_ID")
-//    private Long itemId;
-    /**
-     * 여기서도 Id 대신에 객체를 직접 매핑 시켜준다.
-     * 어떻게? -> @ManyToOne + @JoinColumn(name = 객체의 기본키 컬럼명")
-     */
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ORDER_ID")
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_ID")
-    private Member member;
-
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM_ID")
     private Item item;
 
-    //    @Column(name = "ORDER_DATE_TIME") // 컬럼명은 이런식으로 매핑시키는 것이 더 좋다
-    private LocalDateTime orderDateTime;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private int orderPrice;
+    private int count;
 
     public Long getId() {
         return id;
@@ -57,27 +40,27 @@ public class OrderItem extends BaseEntity{
         this.order = order;
     }
 
-    public Member getMember() {
-        return member;
+    public Item getItem() {
+        return item;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setItem(Item item) {
+        this.item = item;
     }
 
-    public LocalDateTime getOrderDateTime() {
-        return orderDateTime;
+    public int getOrderPrice() {
+        return orderPrice;
     }
 
-    public void setOrderDateTime(LocalDateTime orderDateTime) {
-        this.orderDateTime = orderDateTime;
+    public void setOrderPrice(int orderPrice) {
+        this.orderPrice = orderPrice;
     }
 
-    public OrderStatus getStatus() {
-        return status;
+    public int getCount() {
+        return count;
     }
 
-    public void setStatus(OrderStatus status) {
-        this.status = status;
+    public void setCount(int count) {
+        this.count = count;
     }
 }

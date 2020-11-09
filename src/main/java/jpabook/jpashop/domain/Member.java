@@ -11,13 +11,19 @@ public class Member extends BaseEntity{
     @Column(name = "MEMBER_ID") // 애매한 컬럼만 이름 매핑해준다. java에서는 memberId / DB에서는 member_id or MEMBER_ID 이런식으로 "_"를 선호하는 편이다.
     private Long id;
 
-    @OneToMany(mappedBy = "member")
-    private List<Order> orders = new ArrayList<>();
-
     private String name;
     private String city;
     private String street;
     private String zipcode;
+
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = new ArrayList<>();
+
+    // 편의 메소드
+    public void addOrders(Order order) {
+        this.getOrders().add(order);
+        order.setMember(this);
+    }
 
     public Long getId() {
         return id;
@@ -57,5 +63,13 @@ public class Member extends BaseEntity{
 
     public void setZipcode(String zipcode) {
         this.zipcode = zipcode;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }
