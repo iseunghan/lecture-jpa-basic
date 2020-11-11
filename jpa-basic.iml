@@ -8,6 +8,7 @@
           <factory-entry name="chapter7" />
           <factory-entry name="hello" />
           <factory-entry name="helloshop" />
+          <factory-entry name="jpashop" />
         </datasource-mapping>
         <naming-strategy-map />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/META-INF/persistence.xml" />
