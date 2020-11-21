@@ -38,6 +38,9 @@
 
         <!--chapter9-->
         <class>chapter09_값타입.Member</class>
+        <class>chapter09_값타입.Address</class>
+        <class>chapter09_값타입.Period</class>
+        <class>chapter09_값타입.BaseEntity</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
