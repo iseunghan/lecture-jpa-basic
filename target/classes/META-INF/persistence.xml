@@ -41,6 +41,7 @@
         <class>chapter09_값타입.Address</class>
         <class>chapter09_값타입.Period</class>
         <class>chapter09_값타입.BaseEntity</class>
+        <class>chapter09_값타입.AddressEntity</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

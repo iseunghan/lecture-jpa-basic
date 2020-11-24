@@ -5,6 +5,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
         public static void main(String[] args) {
@@ -18,57 +20,58 @@ public class JpaMain {
             tx.begin();
 
             try {
-                Address address = new Address("city", "street", "zipcode");
-
                 Member member = new Member();
-                member.setUsername("member");
-                member.setHomeAddress(address);
+                member.setUsername("member1");
+                member.setHomeAddress(new Address("homeCity", "street", "zipcode"));
+
+                member.getFavoriteFoods().add("치킨");
+                member.getFavoriteFoods().add("족발");
+                member.getFavoriteFoods().add("피자");
+
+                member.getAddressHistory().add(new AddressEntity("old1", "street", "zipcode"));
+                member.getAddressHistory().add(new AddressEntity("old2", "street", "zipcode"));
+
+                // member 만 persist 해줘도, 값타입 컬렉션들까지 한번에 다같이 insert 쿼리가 나가게 된다. 왜? 값타입이니까
+                // 값 타입 컬렉션은 영속성 전이(CASCADE) + 고아 객체 제거 기능이 필수로 설정 되어있다.
+                // OneToMany(Cascade = CASCADETYPE.ALL, OrpharRemoval = true)
                 em.persist(member);
 
-                Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+                em.flush();
+                em.clear();
 
-                Member member1 = new Member();
-                member1.setUsername("member1");
-                member1.setHomeAddress(copyAddress);
-                em.persist(member1);
-
-                /**
-                 * 임베디드 타입 같은 값 타입을 여러 엔티티에서 공유하면 위험하다!!
-                 * 부작용(side effect) 발생
-                 *
-                 *  member.city = "city"
-                 *  member1.city = "city"
-                 */
-                // -------------------------------------------
-                member.getHomeAddress().setCity("newCity");
+                System.out.println("===================================");
+                Member findMember = em.find(Member.class, member.getId()); // 이때 값 컬렉션에 대해서는 쿼리가 안나간다! 그 말은? -> fetch = LAZY : 지연로딩 전략이라는 뜻!
 
                 /**
-                 * 임베디드 처럼 직접 정의한 값 타입은 자바에서의 기본 타입(primitive Type)이 아니라, 객체 타입이다.
-                 * 그러므로, 값이 복사가 되는게 아니라 -> 주소 값이 복사가 되므로 member1의 값을 바꾸면 member의 값이 함께 바뀌어 버리는것이다!
-                 *
-                 * member.city = "newCity"
-                 * member1.city = "newCity"
-                 * member.city값만 newCity로 바꾸려했지만, 의도치 않게 member1까지 바꿔버렸다.
-                 *
-                 * 이럴땐, Address 객체를 복사해서 member1에 따로 넣어주도록 하자!
-                 *
-                 * <불변 제약 설정!>
-                 * 아니면 생성자로만 값을 생성하고, setter를 만들지 않거나, setter를 private으로 선언하자!
+                 * 조회
                  */
+                /* 실제 값을 사용 할때 쿼리가 나가게 된다!
+                List<Address> addressHistory = findMember.getAddressHistory();
+                for (Address address : addressHistory) {
+                    System.out.println("address = " + address.getCity());
+                }
+
+                Set<String> favoriteFoods = findMember.getFavoriteFoods();
+                for (String favoriteFood : favoriteFoods) {
+                    System.out.println("favoriteFood = " + favoriteFood);
+                }*/
 
                 /**
-                 * 만약 값을 바꾸고 싶다면??
-                 * 귀찮지만, 새로 생성해서 넣어줘야함.
-                 *
-                 * ex) Address address = new Address("city" , "street", "zipcode");
-                 * member.setHomeAddress(address);
-                 * !-- 여기서 내가 city를 newCity로 바꾸고 싶다! --!
-                 * Address newAddress = new Address("newCity", address.getStreet(), address.getZipcode() );
-                 * member.setHomeAddress(newAddress);
-                 * 이런식 으로 변경해 줘야만 함.
-                 *  귀찮은 것 같아도 이렇게 하지 않으면 나중에 큰 문제가 생길 수 있음.
+                 * 수정
+                 * homeCity -> newCity 로 수정하기
                  */
+//                findMember.getHomeAddress().setCity("newCity"); XXX 이렇게 하면 안됨! 값타입은 항상 immutable(불변) 해야하기 때문에 안그러면 side effect(부작용) 발생!
+                // 이런식으로 인스턴스를 통째로 갈아 끼워야 한다!!
+                findMember.setHomeAddress(new Address("newCitu", findMember.getHomeAddress().getStreet(), findMember.getHomeAddress().getZipcode()));
 
+                // 치킨 -> 한식
+                findMember.getFavoriteFoods().remove("치킨");
+                findMember.getFavoriteFoods().add("한식");
+
+                // 주소 바꾸기
+                // 치명적인 오류!! 이렇게 하면 값 타입 테이블엔 식별자가 따로 없기 때문에 해당 memberId에 대한 테이블을 삭제하고 다시 저장하는 일이 벌어진다.(주의!)
+                findMember.getAddressHistory().remove(new Address("old1", "street", "zipcode"));
+                findMember.getAddressHistory().remove(new Address("newCity1", "street", "zipcode"));
 
 
                 tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
