@@ -30,7 +30,7 @@ public class Member {
 
     // 값타입을 매핑하는게 아니라, 엔티티로 매핑을 해준다!
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn(name = "MEMBER_ID") // 이 경우는 값타입이니까 일대다 단방향 매핑을 해준다 -> 연관관계의 주인은 일 이 된다. 만약 양방향이면 당연히 다 쪽을 주인으로 설정!
     private List<AddressEntity> addressHistory = new ArrayList<>();
 
     public Long getId() {
