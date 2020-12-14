@@ -45,11 +45,9 @@
 
         <!--chapter10-->
         <class>chpater10_객체지향쿼리언어.Member</class>
-        <class>chpater10_객체지향쿼리언어.Address</class>
-        <class>chpater10_객체지향쿼리언어.Period</class>
-        <class>chpater10_객체지향쿼리언어.AddressEntity</class>
-        <class>chpater10_객체지향쿼리언어.BaseEntity</class>
-
+        <class>chpater10_객체지향쿼리언어.Team</class>
+        <class>chpater10_객체지향쿼리언어.Product</class>
+        <class>chpater10_객체지향쿼리언어.Order</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
