@@ -37,11 +37,18 @@
         <class>chapter08_프록시_연관관계관리.Parent</class>-->
 
         <!--chapter9-->
-        <class>chapter09_값타입.Member</class>
+        <!--<class>chapter09_값타입.Member</class>
         <class>chapter09_값타입.Address</class>
         <class>chapter09_값타입.Period</class>
         <class>chapter09_값타입.BaseEntity</class>
-        <class>chapter09_값타입.AddressEntity</class>
+        <class>chapter09_값타입.AddressEntity</class>-->
+
+        <!--chapter10-->
+        <class>chpater10_객체지향쿼리언어.Member</class>
+        <class>chpater10_객체지향쿼리언어.Address</class>
+        <class>chpater10_객체지향쿼리언어.Period</class>
+        <class>chpater10_객체지향쿼리언어.AddressEntity</class>
+        <class>chpater10_객체지향쿼리언어.BaseEntity</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
