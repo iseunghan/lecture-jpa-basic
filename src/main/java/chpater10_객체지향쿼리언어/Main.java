@@ -4,6 +4,7 @@ import chapter09_값타입.Address;
 import chapter09_값타입.AddressEntity;
 
 import javax.persistence.*;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,24 +19,29 @@ public class Main {
 
         try {
             Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+            member.setUsername("son");
+            member.setAge(24);
+//            em.persist(member);
 
-            TypedQuery<Member> query = em.createQuery("select m from Member m", Member.class);
-            TypedQuery<String> query1 = em.createQuery("select m.username from Member m", String.class); // username은 String이므로 String.class
-            Query query2 = em.createQuery("select m.username, m.age from Member m"); // int. string 이 섞여 있어서 타입 정보를 받아 올 수 없음.
+            Member member1 = new Member();
+            member1.setUsername("father");
+            member1.setAge(50);
+//            em.persist(member1);
 
+            Team team = new Team();
+            team.setName("Family");
+            team.getMebmers().add(member);
+            team.getMebmers().add(member1);
+            member.setTeam(team);
+            member1.setTeam(team);
+            em.persist(team);
 
-            TypedQuery<Member> query3 = em.createQuery("select m from Member m where m.username =:username", Member.class);
-            query3.setParameter("username", "member1");
-            Member singleResult = query3.getSingleResult();
-            System.out.println("singleResult = " + singleResult.getUsername());
+            em.flush(); // 쿼리를 다 날리고
+            em.clear(); // 영속성 컨텍스트를 초기화 시킨다.
 
-            Member result = em.createQuery("select m from Member m where m.username =:username", Member.class)
-                    .setParameter("username", "member1")
-                    .getSingleResult();
-            System.out.println("result = " + result.getUsername());
+            System.out.println("======================");
+            Team findTeam = em.find(Team.class, team.getId());
+            findTeam.getMebmers().remove(0);
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {

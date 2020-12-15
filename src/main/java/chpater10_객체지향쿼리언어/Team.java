@@ -1,9 +1,6 @@
 package chpater10_객체지향쿼리언어;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +11,7 @@ public class Team {
 
     private String name;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> mebmers = new ArrayList<>();
 
     public Long getId() {
@@ -31,5 +28,13 @@ public class Team {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Member> getMebmers() {
+        return mebmers;
+    }
+
+    public void setMebmers(List<Member> mebmers) {
+        this.mebmers = mebmers;
     }
 }
