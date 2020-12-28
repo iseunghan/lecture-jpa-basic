@@ -18,28 +18,40 @@ public class Main {
         tx.begin();
 
         try {
-            /* 1. member를 100개 생성해준다. */
-            for (int i = 1; i <= 100; i++) {
-                Member member = new Member();
-                member.setUsername("member" + i);
-                member.setAge(i);
-                em.persist(member);
-            }
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setUsername("teamA");
+            member.setAge(10);
+            member.changeTeam(team); /* 편의 메소드 생성함. */
+
+            em.persist(member);
 
             em.flush();
             em.clear();
 
-            /* List로 member들을 받아온다. */
-            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
-                    .setFirstResult(1)  // 페이징: 조회 시작 위치(0부터 시작)
-                    .setMaxResults(10)  // 페이징: 조회할 데이터 수(10개)
-                    .getResultList()    // 결과값을 List
-            ;
+            /**
+             * inner 조인 - (inner 생략 가능)
+             *      select m from Member m (inner) join m.team t"
+             * outer 조인 - (outer 생략 가능)
+             *      select m from Member m left (outer) join m.team t"
+             * 세타 조인
+             *      select m from Member m, Team t where m.username = t.name"
+             */
+
+            /* teamA인 팀만 필터링 */
+//            String qlString = "select m from Member m left join m.team t on t.name = 'teamA'";
+            /* 연관관계 없는 엔티티 외부 조인 */
+            String qlString = "select m from Member m left join Team t on m.username = t.name";
+            /* on절 대신 where절 사용 */
+//            String qlString = "select m from Member m left join m.team t where t.name = 'teamA'";
+            List<Member> resultList = em.createQuery(qlString, Member.class)
+                    .getResultList();// 결과값을 List
 
             System.out.println("resultList.size : " + resultList.size());
-            for (Member member : resultList) {
-                System.out.println("member = " + member);
-            }
+
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
         } catch (Exception e) {
