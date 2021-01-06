@@ -33,24 +33,39 @@ public class Main {
             em.clear();
 
             /**
-             * inner 조인 - (inner 생략 가능)
-             *      select m from Member m (inner) join m.team t"
-             * outer 조인 - (outer 생략 가능)
-             *      select m from Member m left (outer) join m.team t"
-             * 세타 조인
-             *      select m from Member m, Team t where m.username = t.name"
+             * 서브 쿼리
+             *  - 쿼리 안에 또 다른 쿼리
+             *
+             *  서브 쿼리 지원 함수
+             *  - exists : 서브쿼리에 결과가 존재하면 참
+             *  - ALL, ANY, SOME : ALL은 모두 만족하면 참,
+             *                   ANY, SOME은 조건을 하나라도 만족하면 참
+             *  - IN : 서브쿼리의 결과 중 하나라도 같은 것이 있으면 참
              */
+            /* 나이가 평균보다 많은 회원
+            *   서브 쿼리를 보면 Member m 을 가져와서 사용하지 않고, 새로운 m2를 만들어서 조회를 했다.
+            * (이게 성능이 잘 나오게 된다.)
+            */
+            String sql = "select m from Member m " +
+                    "where m.age > (select avg(m2.age) from Member m2)";
 
-            /* teamA인 팀만 필터링 */
-//            String qlString = "select m from Member m left join m.team t on t.name = 'teamA'";
-            /* 연관관계 없는 엔티티 외부 조인 */
-            String qlString = "select m from Member m left join Team t on m.username = t.name";
-            /* on절 대신 where절 사용 */
-//            String qlString = "select m from Member m left join m.team t where t.name = 'teamA'";
-            List<Member> resultList = em.createQuery(qlString, Member.class)
-                    .getResultList();// 결과값을 List
+            /* 한 건이라도 주문한 고객 */
+//            String sql2 = "select m from Member m " +
+//                    "where (select count(o) from Order o where m = o.member) > 0";
 
-            System.out.println("resultList.size : " + resultList.size());
+            /* 서브쿼리 지원 함수 */
+            // 팀A에 속한 멤버 exists가 리턴하는 값이 true인 경우에만 메인 쿼리를 실행한다는 뜻!
+            String sup1 = "select m from Member m where exists (select t from m.team t where t.name = 'teamA')";
+
+            // 전체 상품 각각의 재고보다 주문량이 많은 주문들
+            String sup2 = "select o from Order o where o.orderAmount > ALL (select p.stockAmount from Product p)";
+
+            // 어떤 팀이든 팀에 소속된 회원
+            String sup3 = "select m from Member m where m.team = ANY(select t from Team t)";
+
+
+//            List<Member> resultList = em.createQuery(sql, Member.class)
+//                    .getResultList();
 
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
