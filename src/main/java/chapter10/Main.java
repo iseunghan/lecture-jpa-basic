@@ -20,25 +20,36 @@ public class Main {
             em.persist(team);
 
             Member member = new Member();
-            member.setUsername("teamA");
+            member.setUsername("관리자");
             member.setAge(10);
             member.changeTeam(team); /* 편의 메소드 생성함. */
             member.setType(MemberType.ADMIN);
 
-            em.persist(member);
+            Member member2 = new Member();
+            member2.setUsername("관리자");
+            member2.setAge(10);
+            member2.changeTeam(team); /* 편의 메소드 생성함. */
+            member2.setType(MemberType.ADMIN);
+
 
             em.flush();
             em.clear();
 
-            String sql = "select m.username, 'HELLO', true From Member m where m.type = chapter10.MemberType.ADMIN";
+//            String query = "select " +
+//                    "case when m.age <= 10 then '학생요금'" +
+//                        "when m.age >= 60 then '경로요금'" +
+//                        "else '일반요금'" +
+//                    "end " +
+//                    "from Member m";
 
-            List<Object[]> result = em.createQuery(sql)
+            String query = "select group_concat(m.username) from Member m";
+
+            List<String> resultList = em.createQuery(query, String.class)
                     .getResultList();
 
-            for (Object[] objects : result) {
-                System.out.println(objects[0]);
-                System.out.println(objects[1]);
-                System.out.println(objects[2]);
+
+            for (String integer : resultList) {
+                System.out.println("integer = " + integer);
             }
 
 
