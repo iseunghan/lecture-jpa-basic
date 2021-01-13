@@ -44,10 +44,10 @@
         <class>chapter09_값타입.AddressEntity</class>-->
 
         <!--chapter10-->
-        <class>chpater10_객체지향쿼리언어.Member</class>
-        <class>chpater10_객체지향쿼리언어.Team</class>
-        <class>chpater10_객체지향쿼리언어.Product</class>
-        <class>chpater10_객체지향쿼리언어.Order</class>
+        <class>ch10.Member</class>
+        <class>ch10.Team</class>
+        <class>ch10.Product</class>
+        <class>ch10.Order</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

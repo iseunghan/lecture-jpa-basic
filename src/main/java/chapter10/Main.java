@@ -1,7 +1,4 @@
-package chpater10_객체지향쿼리언어;
-
-import chapter09_값타입.Address;
-import chapter09_값타입.AddressEntity;
+package chapter10;
 
 import javax.persistence.*;
 import java.util.List;
@@ -26,12 +23,23 @@ public class Main {
             member.setUsername("teamA");
             member.setAge(10);
             member.changeTeam(team); /* 편의 메소드 생성함. */
+            member.setType(MemberType.ADMIN);
 
             em.persist(member);
 
             em.flush();
             em.clear();
 
+            String sql = "select m.username, 'HELLO', true From Member m where m.type = chapter10.MemberType.ADMIN";
+
+            List<Object[]> result = em.createQuery(sql)
+                    .getResultList();
+
+            for (Object[] objects : result) {
+                System.out.println(objects[0]);
+                System.out.println(objects[1]);
+                System.out.println(objects[2]);
+            }
 
 
             tx.commit(); // 이때 쌓아뒀던 쿼리를 한방에 날린다.
